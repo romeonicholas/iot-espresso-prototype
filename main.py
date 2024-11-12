@@ -1,4 +1,5 @@
 from phew import server, access_point, dns
+from phew.template import render_template
 
 import secrets
 
@@ -13,22 +14,18 @@ def setup_mode():
 
     @server.route("/", methods=['GET'])
     def index(request):
-        return "Hello, World!", 200
+        if request.headers.get("host").lower() != ACCESS_POINT_DOMAIN:
+            return render_template("templates/redirect.html", domain = ACCESS_POINT_DOMAIN)
 
-    @server.route("/wrong-host-redirect", methods=['GET'])
-    def wrong_host(request):
-        body = "<!DOCTYPE html><head><meta http-equiv='refresh' content='0;URL=http://" + ACCESS_POINT_DOMAIN + "' /></head>"
-        return body
+        return render_template("templates/index.html")
 
-    @server.route("/hotspot-detect.html", methods=["GET"])
-    def hotspot(request):
-        return "This is the portal", 200
-
+    
     @server.catchall()
     def catch_all(request):
         if request.headers.get("host") != ACCESS_POINT_DOMAIN:
-            return server.redirect("http://" + ACCESS_POINT_DOMAIN + "/wrong-host-redirect")
-        return None
+            return render_template("templates/redirect.html", domain=ACCESS_POINT_DOMAIN)
+
+        return "Not found", 404
 
     ap = access_point(ACCESS_POINT_NAME)
     ip = ap.ifconfig()[0]

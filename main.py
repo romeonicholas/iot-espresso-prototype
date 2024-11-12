@@ -1,6 +1,4 @@
-import phew
-import phew.server
-import phew.dns
+from phew import server, access_point, dns
 
 import secrets
 
@@ -13,29 +11,29 @@ ACCESS_POINT_DOMAIN = "iot.espresso.net"
 def setup_mode():
     print("Entering setup mode...")
 
-    @phew.server.route("/", methods=['GET'])
-    def index():
+    @server.route("/", methods=['GET'])
+    def index(request):
         return "Hello, World!", 200
 
-    @phew.server.route("/wrong-host-redirect", methods=['GET'])
-    def wrong_host():
+    @server.route("/wrong-host-redirect", methods=['GET'])
+    def wrong_host(request):
         body = "<!DOCTYPE html><head><meta http-equiv='refresh' content='0;URL=http://" + ACCESS_POINT_DOMAIN + "' /></head>"
         return body
 
-    @phew.server.route("/hotspot-detect.html", methods=["GET"])
-    def hotspot():
+    @server.route("/hotspot-detect.html", methods=["GET"])
+    def hotspot(request):
         return "This is the portal", 200
 
-    @phew.server.catchall()
+    @server.catchall()
     def catch_all(request):
         if request.headers.get("host") != ACCESS_POINT_DOMAIN:
-            return phew.server.redirect("http://" + ACCESS_POINT_DOMAIN + "/wrong-host-redirect")
+            return server.redirect("http://" + ACCESS_POINT_DOMAIN + "/wrong-host-redirect")
         return None
 
-    ap = phew.access_point(ACCESS_POINT_NAME)
+    ap = access_point(ACCESS_POINT_NAME)
     ip = ap.ifconfig()[0]
-    phew.dns.run_catchall(ip)
+    dns.run_catchall(ip)
 
 
 setup_mode()
-phew.server.run()
+server.run()

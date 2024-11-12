@@ -8,12 +8,17 @@
     <h1>IoT Espresso Helper</h1>
   </header>
   <body>
-    <h2>First Time Setup</h2>
+    <h2>Network Setup</h2>
     <p>
       Please enter your wireless network's SSID and password to enable the
       device to connect to your network.
     </p>
-    <form action="/" method="POST" autocomplete="off" autocapitalize="none">
+    <form
+      action="/setup"
+      method="POST"
+      autocomplete="off"
+      autocapitalize="none"
+    >
       <label for="ssid">SSID:</label><br />
       <input type="text" id="ssid" name="ssid" /><br />
       <label for="password">Password:</label><br />
